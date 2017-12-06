@@ -3,6 +3,8 @@ README.md
 setup.cfg
 setup.py
 versioneer.py
+logger/__init__.py
+logger/qem_logger.py
 qem/__init__.py
 qem/_version.py
 qem/ad7998.py

@@ -27,6 +27,8 @@ function App()
         (function()
         {
             this.generate(meta);
+//            this.put("logger_state", ":");
+//            this.put("logger_state", ":");
             setTimeout(this.update.bind(this), this.update_delay * 1000);
         }).bind(this)
     );
@@ -48,6 +50,14 @@ App.prototype.update =
             (function(data)
             {
                 this.adapters[adapters[updating_adapter]].update(data);
+                if (data['logger_state'] == "0") {
+                    $('#logging-toggle').text("Start");
+                } else if (data['logger_state'] == "1" || data['logger_state'] == "2") {
+                    $('#logging-toggle').text("Stop");
+                } else {
+                    document.getElementById("logging-header").innerHTML = `Logging unavailable - influxdb not found`;
+                    $('#logging-toggle').attr('disabled', true);
+                }
                 setTimeout(this.update.bind(this), this.update_delay * 1000);
             }).bind(this)
         )
@@ -402,7 +412,7 @@ App.prototype.generate =
         this.logging_overlay.classList.add("hidden");
         this.logging_overlay.innerHTML = `
 <div class="overlay-logging">
-    <h5>Logging:</h5>
+    <h5 id='logging-header'>Logging:</h5>
     <div class="overlay-logging-padding">
         <label>URL:</label>
         <div class="input-group">
@@ -1758,7 +1768,17 @@ App.prototype.loggingCancel =
 App.prototype.loggingToggle =
     function()
     {
-        this.logging_overlay.classList.add("hidden");
+        if  ($('#logging-toggle').text() == "Start") {
+            url = window.location.hostname;
+            var db_url = document.getElementById("logging-url").value;
+            if (db_url.length == 0) db_url="localhost"
+            var db_port =  document.getElementById("logging-port").value;
+            if (db_port.length == 0) db_port="8086"
+            var location = url + ";" + db_url + ":" + db_port;
+            this.put("logger_state", location);
+        } else {
+            this.put("logger_state", ";:");
+        }
     };
 
 

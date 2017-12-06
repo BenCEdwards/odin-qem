@@ -1,11 +1,10 @@
 Metadata-Version: 1.0
 Name: qem
-Version: 0+untagged.43.gc079c88.dirty
+Version: 0+untagged.48.g65ba9b1.dirty
 Summary: QEM Backplane plugin for ODIN framework
 Home-page: https://github.com/timcnicholls/odin
 Author: Tim Nicholls
 Author-email: tim.nicholls@stfc.ac.uk
 License: UNKNOWN
-Description-Content-Type: UNKNOWN
 Description: UNKNOWN
 Platform: UNKNOWN

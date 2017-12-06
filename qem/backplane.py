@@ -245,9 +245,53 @@ class Backplane(I2CContainer):
     def set_update(self, value):
         if value and not self.sensors_enabled: self.updates_needed = 1
 
-#    def get_logger_state(self):
-#        return self.logger_state
+    def get_logger_state(self):
+        if self.logger_state == u"1":
+            if not self.logger.do_update:
+                self.logger_state =  u"0"
+                self.logger = None
+            elif self.logger.setup_done:
+                self.logger_state = u"2"
+        return self.logger_state
 
+    def set_logger_state(self, locations):
+        if self.logger_state == u"0":
+            pscu_host,db_location = locations.split(";")
+            self.start_log(pscu_host,db_location)
+            self.logger_state = u"1"
+        elif self.logger_state in {u"1", u"2"}:
+            self.logger_state = u"0"
+            self.logger = None
+
+    def start_log(self,pscu_host,db_location):
+        self.logger = qemLogger(pscu_host,db_location)
+
+    def update_log(self):
+        log_power_data = {}
+        for i in range(8): log_power_data[i+1] = self.power_good[i]
+        log_supply_data = {}
+        for i in range(13):
+            log_supply_data[i] = {
+                "voltage": self.voltages[i],
+                "voltage_register": self.voltages_raw[i],
+                "current": self.currents[i],
+                "current_register": self.currents_raw[i],
+            }
+        log_resistor_data = {}
+        for i in range(7):
+            log_resistor_data[i] = {
+                'resistance': self.resistors[i],
+                'register': self.resistors_raw[i],
+            }
+        log_data = {
+            'sensors_enabled': self.sensors_enabled,
+            'psu_enabled': self.psu_enabled,
+            'clock': self.clock_freq,
+            'power_good': log_power_data,
+            'current_voltage': log_supply_data,
+            'resistors': log_resistor_data,
+        }
+        self.logger.do_update(log_data)
 
     def set_reset(self, value):
         self.mcp23008[1].setup(0, MCP23008.OUT)
@@ -274,7 +318,9 @@ class Backplane(I2CContainer):
             3.3 * (390 * self.resistors_raw[6]) / (390 * self.resistors_raw[6] + 32000),
 ]
         self.set_psu_enable(True)
-       
+        if self.logger_state != u"N/A":
+            self.logger = None
+            self.logger_state = u"0"
 
     def get_current(self, i):
         return self.currents[i]
@@ -292,3 +338,4 @@ class Backplane(I2CContainer):
         return ["VDDO", "VDD_D18", "VDD_D25", "VDD_P18",  "VDD_A18_PLL",  "VDD_D18ADC",
                "VDD_D18_PLL", "VDD_RST", "VDD_A33", "VDD_D33", "VCTRL_NEG", "VRESET",
                "VCTRL_POS"][i]
+

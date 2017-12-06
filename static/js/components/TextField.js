@@ -28,12 +28,15 @@ TextField.prototype.update =
         if(data === this.oldValue) return;
 
         this.oldValue = data;
-        this.textElem.placeholder = data.toString();
+        if (this.meta.name != "Logger State")
+            this.textElem.placeholder = data.toString();
     };
 
 TextField.prototype.generate =
     function()
     {
+        if(this.meta.name == "Logger State")
+            return
         if(this.meta.hasOwnProperty("dp"))
             this.dp = this.meta.dp;
 
@@ -63,9 +66,11 @@ TextField.prototype.generate =
 TextField.prototype.init =
     function()
     {
-        this.textElem = document.getElementById(this.getID() + "-input");
-        this.buttonElem = document.getElementById(this.getID() + "-button");
-        this.buttonElem.addEventListener("click", this.onClick.bind(this));
+        if(this.meta.name != "Logger State") {
+            this.textElem = document.getElementById(this.getID() + "-input");
+            this.buttonElem = document.getElementById(this.getID() + "-button");
+            this.buttonElem.addEventListener("click", this.onClick.bind(this));
+        }
     };
 
 TextField.prototype.onClick =
