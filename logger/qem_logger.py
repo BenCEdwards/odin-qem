@@ -1,13 +1,19 @@
 import sys
 import logging
-import requests
 import json
 import datetime
 import time
 import signal
 
-from influxdb import InfluxDBClient
-
+try:
+    import requests
+except ImportError:
+    logging.warning("requests module not found, logger unavailable");
+    sys.exit(0)
+try:
+    from influxdb import InfluxDBClient
+except ImportError:
+    logging.warning("influxdb module not found, logger unavailable");
 
 db_name='qem_test'
 pscu_port = 8888
