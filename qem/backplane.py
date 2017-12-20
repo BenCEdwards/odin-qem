@@ -72,7 +72,7 @@ class Backplane(I2CContainer):
                 logging.error("I2C Communications not enabled for user. Try 'su -;chmod 666 /dev/i2c-1'")
             else:
                 logging.error(exc)
-            sys.exit(0)
+            sys.exit(1)
         finally:
             signal.alarm(0)
             if logger_imported:
