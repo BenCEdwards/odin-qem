@@ -38,7 +38,7 @@ class Resistor(object):
     def __init__(self, backplane, i):
         self.index = i
         self.backplane = backplane
-        
+
         self.param_tree = MetadataTree({
             "name" : self.backplane.get_resistor_name(self.index),
             "resistance" : (self.get, self.set, {"units" : self.backplane.get_resistor_units(self.index), "min" : self.backplane.get_resistor_min(self.index), "max" : self.backplane.get_resistor_max(self.index)}),
@@ -56,6 +56,7 @@ class Resistor(object):
 
     def raw_set(self, value):
         self.backplane.set_resistor_value_raw(self.index, value)
+
 
 class BackplaneData(object):
 
@@ -89,6 +90,7 @@ class BackplaneData(object):
             "current_voltage" : [cv.param_tree for cv in self.current_voltage],
             "resistors" : [r.param_tree for r in self.resistors],
             "reset" : (False, self.backplane.set_reset,{"name" : "Reset Server"}),
+            "temperature" : (self.backplane.get_temp,{"units":"C", "dp":1}),
             "logger_state" : (self.backplane.get_logger_state, self.backplane.set_logger_state,{"name" : "Logger State"}),
         })
 
